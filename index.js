@@ -1,75 +1,77 @@
+let playerScore = 0
+let computerScore = 0
+
+const buttons = document.querySelectorAll('.buttons > *')
+buttons.forEach(button => {
+    button.addEventListener('click', (e) => {
+        let playerSelection = e.target.classList.value
+        let computerSelection = computerPlay()
+        let result = playRound(playerSelection, computerSelection)
+        printResults(result)
+        if(checkWinner()){
+            endGame()
+            changeButtons(true)
+        }
+    })
+})
+
 function computerPlay(){
     let choices = ["rock", "paper", "scissors"]
     return choices[Math.floor(Math.random() * 3)]
-}
-
-function getUserInput(){
-    let userChoice
-    let noOfEntries = 0
-    while(!(["rock", "paper", "scissors"].includes(userChoice))){
-        noOfEntries == 0 ? noOfEntries++ : alert("Invalid entry")
-        userChoice = prompt("Please enter Rock, Paper or Scissors").toLowerCase()
-    }
-    return userChoice
 }
 
 function playRound(playerSelection, computerSelection){
     if( (playerSelection === "rock" && computerSelection === "scissors") 
       || (playerSelection === "paper" && computerSelection === "rock")
       || (playerSelection === "scissors" && computerSelection === "paper") ){
-        return 1
+        playerScore++
+        return 'You win!'
       }
     else if(playerSelection === computerSelection){
-        return 0
+        return "IT's a Draw!"
     }
     else{
-        return -1
+        computerScore++
+        return "You lose! Computer wins!"
     }
 }
 
-function playGame(){
-    let scoreCard = [0, 0];
-    for(let i = 0; i < 5; i++){
-        let computerSelection = computerPlay()
-        let playerSelection = getUserInput()
-        let result = playRound(playerSelection, computerSelection)
-        if(result === 1){
-            console.log(`You won! ${playerSelection} beats ${computerSelection}`)
-            scoreCard[0]++
-        }
-        else if(result === -1){
-            console.log(`Computer won! ${computerSelection} beats ${playerSelection}`)
-            scoreCard[1]++
-        }
-        else{
-            console.log("It's a Draw!")
-        }
 
-    }
-    return scoreCard
+
+function printResults(result){
+    let infoBox = document.querySelectorAll('.round-info > *')
+    infoBox[0].textContent = result
+    infoBox[1].textContent = `Player Score: ${playerScore}`
+    infoBox[2].textContent = `Computer Score: ${computerScore}`
 }
 
-function printFinalResult(scoreCard){
-    let playerScore = scoreCard[0]
-    let computerScore = scoreCard[1]
+function checkWinner(){
+   return playerScore > 4 || computerScore > 4
+}
+
+function endGame(){
+    const resultBox = document.querySelector('.result')
     if(playerScore > computerScore){
-        console.log("The Player has won the Series!")
-    }
-    else if(computerScore > playerScore){
-        console.log("The Computer has won the Series!")
+        resultBox.textContent = 'Yay you won! The computer has been defeated!'
     }
     else{
-        console.log("This series has ended up in a draw")
+        resultBox.textContent = 'You lost! Better luck next time :('
     }
-    console.log("Final Scores are as follows")
-    console.log(`Player: ${playerScore}`)
-    console.log(`Computer: ${computerScore}`)
 }
 
-function startGame(){
-    let scoreCard = playGame()
-    console.log("\nThank you for Playing")
-    printFinalResult(scoreCard)
+function changeButtons(status){
+    document.querySelectorAll('.buttons > *')
+    buttons.forEach(button => {
+        button.disabled = status
+    })
 }
 
-startGame()
+function resetGame(){
+    playerScore = 0
+    computerScore = 0
+    printResults('Game Begins!')
+    document.querySelector('.result').textContent = "You can win!, We believe in you!"
+    changeButtons(false)
+}
+
+document.querySelector('.reset').addEventListener('click', resetGame)
